@@ -1,0 +1,13 @@
+__pycache__
+*.py[cod]
+.pytest_cache
+.venv
+venv
+env
+data
+artifacts
+*.keras
+.env
+.git
+.gitignore
+work

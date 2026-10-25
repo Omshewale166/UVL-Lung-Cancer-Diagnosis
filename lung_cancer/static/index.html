@@ -1,0 +1,1002 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f8fc">
+  <meta name="description" content="Research interface for classifying one CT image slice.">
+  <title>Lung CT Slice Classifier</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      color: #182b3c;
+      background: #f5f8fc;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      --ink: #182b3c;
+      --muted: #617487;
+      --line: #dce5ed;
+      --panel: #ffffff;
+      --canvas: #f5f8fc;
+      --teal: #087e83;
+      --teal-dark: #06686d;
+      --teal-pale: #eaf7f6;
+      --warning: #845214;
+      --warning-pale: #fff6e7;
+      --danger: #a6383f;
+      --danger-pale: #fff0f0;
+      --success: #24704f;
+      --success-pale: #eaf7f0;
+      --shadow: 0 18px 48px rgb(24 43 60 / 8%);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      background:
+        radial-gradient(ellipse at 18% 0%, rgb(8 126 131 / 8%), transparent 32rem),
+        var(--canvas);
+    }
+
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: wait; }
+    [hidden] { display: none !important; }
+
+    .shell {
+      width: min(100% - 40px, 1080px);
+      margin-inline: auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-block: 22px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      color: var(--ink);
+      font-size: .98rem;
+      font-weight: 750;
+      letter-spacing: -.02em;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      color: white;
+      background: var(--teal);
+      border-radius: 12px;
+      box-shadow: 0 5px 14px rgb(8 126 131 / 20%);
+    }
+
+    .research-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 11px;
+      color: #43586a;
+      background: rgb(255 255 255 / 78%);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: .78rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .hero {
+      max-width: 760px;
+      padding-block: 34px 25px;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--teal-dark);
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      max-width: 720px;
+      margin-bottom: 13px;
+      font-size: clamp(2rem, 5vw, 3.15rem);
+      line-height: 1.08;
+      letter-spacing: -.055em;
+    }
+
+    .hero-copy {
+      max-width: 630px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    .safety-notice {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 13px;
+      align-items: start;
+      margin: 10px 0 24px;
+      padding: 17px 19px;
+      color: #67420f;
+      background: var(--warning-pale);
+      border: 1px solid #f0d7a9;
+      border-radius: 14px;
+    }
+
+    .safety-notice strong { display: block; margin-bottom: 3px; }
+    .safety-notice p { margin: 0; color: #725b36; font-size: .91rem; line-height: 1.55; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.12fr) minmax(260px, .88fr);
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .upload-panel { padding: clamp(20px, 4vw, 30px); }
+
+    .section-heading {
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+      margin-bottom: 21px;
+    }
+
+    .step-number {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      place-items: center;
+      color: var(--teal-dark);
+      background: var(--teal-pale);
+      border-radius: 11px;
+      font-size: .88rem;
+      font-weight: 800;
+    }
+
+    .section-heading h2 { margin: 1px 0 4px; font-size: 1.12rem; letter-spacing: -.02em; }
+    .section-heading p { margin: 0; color: var(--muted); font-size: .88rem; }
+
+    .dropzone {
+      display: flex;
+      min-height: 184px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 22px;
+      color: var(--ink);
+      text-align: center;
+      background: #f9fbfd;
+      border: 1.5px dashed #afc4d3;
+      border-radius: 15px;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+      cursor: pointer;
+    }
+
+    .dropzone:hover, .dropzone:focus-within, .dropzone.is-dragging {
+      background: #f0f9f8;
+      border-color: var(--teal);
+    }
+
+    .dropzone.is-dragging { transform: scale(1.01); }
+
+    .drop-icon {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      place-items: center;
+      color: var(--teal-dark);
+      background: var(--teal-pale);
+      border-radius: 15px;
+    }
+
+    .drop-main { font-weight: 750; }
+    .drop-sub { color: var(--muted); font-size: .82rem; }
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      clip-path: inset(50%);
+    }
+
+    .dropzone:focus-within { outline: 3px solid rgb(8 126 131 / 20%); outline-offset: 3px; }
+
+    .file-selected {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      padding: 11px 13px;
+      background: #f5f8fb;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    .file-copy { min-width: 0; flex: 1; }
+    .file-name { overflow: hidden; margin: 0; font-size: .88rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+    .file-size { margin: 2px 0 0; color: var(--muted); font-size: .77rem; }
+
+    .icon-button {
+      display: inline-grid;
+      width: 36px;
+      height: 36px;
+      flex: 0 0 auto;
+      place-items: center;
+      color: #52687b;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+
+    .icon-button:hover { color: var(--danger); border-color: #e6b7b9; }
+
+    .field { display: grid; gap: 7px; margin-top: 20px; }
+    .field label { font-size: .86rem; font-weight: 700; }
+    .field-hint { margin: -2px 0 0; color: var(--muted); font-size: .78rem; }
+
+    .text-input {
+      width: 100%;
+      min-height: 46px;
+      padding: 10px 12px;
+      color: var(--ink);
+      background: white;
+      border: 1px solid #cbd8e2;
+      border-radius: 11px;
+      outline: none;
+      transition: border-color .16s ease, box-shadow .16s ease;
+    }
+
+    .text-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgb(8 126 131 / 13%); }
+
+    .form-actions { display: flex; align-items: center; gap: 12px; margin-top: 22px; }
+
+    .primary-button {
+      display: inline-flex;
+      min-height: 47px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 11px 18px;
+      color: white;
+      background: var(--teal);
+      border: 1px solid var(--teal);
+      border-radius: 11px;
+      box-shadow: 0 5px 12px rgb(8 126 131 / 17%);
+      font-weight: 750;
+      transition: background .16s ease, transform .16s ease, box-shadow .16s ease;
+    }
+
+    .primary-button:hover:not(:disabled) {
+      background: var(--teal-dark);
+      box-shadow: 0 7px 16px rgb(8 126 131 / 23%);
+      transform: translateY(-1px);
+    }
+
+    .primary-button:focus-visible, .secondary-button:focus-visible, .icon-button:focus-visible {
+      outline: 3px solid rgb(8 126 131 / 30%);
+      outline-offset: 2px;
+    }
+
+    .primary-button:disabled { opacity: .72; }
+    .privacy-note { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: .78rem; }
+
+    .spinner {
+      width: 17px;
+      height: 17px;
+      border: 2px solid rgb(255 255 255 / 45%);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .info-panel { padding: clamp(20px, 4vw, 28px); }
+    .info-panel h2 { margin-bottom: 8px; font-size: 1.08rem; letter-spacing: -.02em; }
+    .info-panel > p { margin-bottom: 19px; color: var(--muted); font-size: .88rem; line-height: 1.6; }
+
+    .steps { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none; }
+    .steps li { display: grid; grid-template-columns: 31px 1fr; gap: 11px; align-items: start; }
+    .step-icon { display: grid; width: 30px; height: 30px; place-items: center; color: var(--teal-dark); background: var(--teal-pale); border-radius: 10px; }
+    .steps strong { display: block; margin: 1px 0 3px; font-size: .85rem; }
+    .steps span:last-child { color: var(--muted); font-size: .8rem; line-height: 1.5; }
+
+    .status-message {
+      display: flex;
+      min-height: 0;
+      align-items: flex-start;
+      gap: 9px;
+      margin-top: 17px;
+      padding: 0;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    .status-message:not(:empty) { min-height: 22px; }
+    .status-message[data-state="success"], .status-message[data-state="error"] { padding: 12px 13px; border-radius: 11px; }
+    .status-message[data-state="success"] { color: #1b6444; background: var(--success-pale); }
+    .status-message[data-state="error"] { color: #8d3036; background: var(--danger-pale); }
+    .status-message[data-state="loading"] { color: var(--teal-dark); }
+
+    .results { margin-top: 28px; scroll-margin-top: 18px; }
+    .results:focus { outline: none; }
+    .results-topline { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin: 0 0 13px; }
+    .results-topline h2 { margin: 0; font-size: 1.35rem; letter-spacing: -.03em; }
+    .results-topline p { margin: 4px 0 0; color: var(--muted); font-size: .86rem; }
+
+    .result-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(290px, .9fr); gap: 16px; }
+    .result-card { padding: clamp(20px, 4vw, 28px); }
+    .result-label { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: var(--muted); font-size: .78rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .classification { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 13px; }
+    .classification h3 { margin: 0; font-size: clamp(1.7rem, 5vw, 2.35rem); line-height: 1.1; letter-spacing: -.045em; }
+
+    .category-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      color: #4d6172;
+      background: #f0f4f7;
+      border-radius: 999px;
+      font-size: .75rem;
+      font-weight: 800;
+    }
+
+    .category-badge.normal { color: var(--success); background: var(--success-pale); }
+    .category-badge.benign { color: var(--warning); background: var(--warning-pale); }
+    .category-badge.malignant { color: var(--danger); background: var(--danger-pale); }
+    .summary-copy { max-width: 640px; margin-bottom: 17px; color: #405669; line-height: 1.65; }
+
+    .confidence-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 15px;
+      background: #f6f9fb;
+      border: 1px solid #e5edf2;
+      border-radius: 13px;
+    }
+
+    .confidence-label { color: var(--muted); font-size: .82rem; font-weight: 700; }
+    .confidence-value { color: var(--ink); font-size: 1.24rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .small-note { margin: 10px 0 0; color: var(--muted); font-size: .76rem; line-height: 1.55; }
+
+    .probability-card h3 { margin: 0 0 6px; font-size: 1rem; }
+    .probability-intro { margin: 0 0 19px; color: var(--muted); font-size: .81rem; line-height: 1.5; }
+    .probability-list { display: grid; gap: 17px; }
+    .probability-heading { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 7px; font-size: .84rem; }
+    .probability-heading strong { font-variant-numeric: tabular-nums; }
+    .bar-track { height: 8px; overflow: hidden; background: #eaf0f4; border-radius: 999px; }
+    .bar-fill { width: 0; height: 100%; background: #8b9cab; border-radius: inherit; transition: width .5s ease; }
+    .bar-fill.normal { background: #4b9b74; }
+    .bar-fill.benign { background: #d09a43; }
+    .bar-fill.malignant { background: #c45c61; }
+
+    .result-caution {
+      display: grid;
+      grid-template-columns: 23px 1fr;
+      gap: 10px;
+      margin-top: 16px;
+      padding: 14px 15px;
+      color: #684913;
+      background: var(--warning-pale);
+      border: 1px solid #f1dfbd;
+      border-radius: 13px;
+      font-size: .82rem;
+      line-height: 1.55;
+    }
+
+    .result-caution p { margin: 0; }
+    .details-panel { margin-top: 16px; overflow: hidden; }
+    details > summary { display: flex; min-height: 58px; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 19px; color: var(--ink); font-weight: 750; cursor: pointer; list-style: none; }
+    details > summary::-webkit-details-marker { display: none; }
+    details > summary::after { content: "+"; color: var(--teal-dark); font-size: 1.3rem; font-weight: 500; }
+    details[open] > summary::after { content: "−"; }
+    details > summary:focus-visible { outline: 3px solid rgb(8 126 131 / 25%); outline-offset: -3px; }
+    .details-body { padding: 0 19px 19px; }
+    .technical-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; }
+    .technical-item { padding: 12px; background: #f7f9fb; border-radius: 11px; }
+    .technical-item dt { margin-bottom: 4px; color: var(--muted); font-size: .75rem; font-weight: 700; }
+    .technical-item dd { margin: 0; overflow-wrap: anywhere; font-size: .84rem; font-weight: 650; }
+    .technical-report { margin: 14px 0 0; color: #53687a; font-size: .83rem; line-height: 1.6; }
+
+    .raw-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 11px; }
+    .raw-toolbar p { margin: 0; color: var(--muted); font-size: .8rem; }
+    .raw-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .secondary-button { display: inline-flex; min-height: 36px; align-items: center; justify-content: center; gap: 7px; padding: 7px 10px; color: #324b5e; background: white; border: 1px solid #cbd8e2; border-radius: 9px; font-size: .78rem; font-weight: 700; }
+    .secondary-button:hover { color: var(--teal-dark); background: #f3faf9; border-color: #a5cecc; }
+
+    .json-viewer {
+      max-height: 390px;
+      overflow: auto;
+      padding: 12px 0;
+      color: #d8e4ed;
+      background: #142432;
+      border: 1px solid #263b4c;
+      border-radius: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: .79rem;
+      line-height: 1.65;
+      tab-size: 2;
+    }
+
+    .json-line { display: grid; grid-template-columns: 3.2em minmax(max-content, 1fr); padding-right: 15px; }
+    .line-number { padding-right: 12px; color: #748b9e; text-align: right; user-select: none; }
+    .json-content { white-space: pre; }
+    .json-key { color: #9ed7ed; }
+    .json-string { color: #b7dfad; }
+    .json-number { color: #f2c47a; }
+    .json-literal { color: #d4a9f4; }
+    .copy-status { min-height: 1.2em; margin: 8px 0 0; color: var(--success); font-size: .78rem; }
+
+    footer { padding: 28px 0 38px; color: var(--muted); font-size: .77rem; line-height: 1.6; text-align: center; }
+    footer p { margin: 0; }
+
+    @media (max-width: 760px) {
+      .layout { grid-template-columns: 1fr; }
+      .info-panel { order: 2; }
+      .result-grid { grid-template-columns: 1fr; }
+      .hero { padding-top: 22px; }
+    }
+
+    @media (max-width: 520px) {
+      .shell { width: min(100% - 28px, 1080px); }
+      .topbar { padding-block: 15px; }
+      .brand { gap: 8px; font-size: .88rem; }
+      .brand-mark { width: 34px; height: 34px; }
+      .research-tag { padding: 6px 8px; font-size: .69rem; }
+      .hero { padding-block: 24px 20px; }
+      .hero-copy { font-size: .96rem; }
+      .safety-notice { padding: 14px; }
+      .form-actions { align-items: stretch; flex-direction: column; }
+      .primary-button { width: 100%; }
+      .privacy-note { justify-content: center; }
+      .results-topline { align-items: flex-start; flex-direction: column; }
+      .technical-grid { grid-template-columns: 1fr; }
+      details > summary { padding-inline: 15px; }
+      .details-body { padding-inline: 15px; }
+      .raw-toolbar { align-items: flex-start; flex-direction: column; }
+      .raw-actions { width: 100%; }
+      .secondary-button { flex: 1; }
+    }
+
+    @media (max-width: 380px) {
+      .topbar { align-items: flex-start; gap: 8px; }
+      .brand { gap: 6px; font-size: .78rem; }
+      .brand-mark { width: 31px; height: 31px; }
+      .research-tag { gap: 4px; padding: 5px 7px; font-size: .62rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Lung CT Slice Classifier home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3v8m0 0c-2.2-3.4-4.2-4.3-5.5-3.1C4.8 9.5 4 12.5 4 16c0 2.6 1.3 4 3.5 4 2.7 0 4.5-2.7 4.5-6.1m0-2.9c2.2-3.4 4.2-4.3 5.5-3.1C19.2 9.5 20 12.5 20 16c0 2.6-1.3 4-3.5 4-2.7 0-4.5-2.7-4.5-6.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        Lung CT Classifier
+      </a>
+      <span class="research-tag">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 20 6v5c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V6l8-3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 8v4m0 3h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Research use only
+      </span>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <p class="eyebrow">CT slice classification</p>
+        <h1 id="page-title">A clearer view of your model results.</h1>
+        <p class="hero-copy">Upload one CT image slice to see the model’s category scores in a simple report. This tool is for research and education, not medical decisions.</p>
+      </section>
+
+      <aside class="safety-notice" aria-label="Important medical disclaimer">
+        <svg width="25" height="25" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 21 19H3L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9v4m0 3h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <div>
+          <strong>Research software only</strong>
+          <p>This model is not a medical device. Its output cannot diagnose, rule out, or treat disease. Ask a qualified radiologist to review the full study.</p>
+        </div>
+      </aside>
+
+      <div class="layout">
+        <section class="panel upload-panel" aria-labelledby="upload-title">
+          <div class="section-heading">
+            <span class="step-number" aria-hidden="true">01</span>
+            <div>
+              <h2 id="upload-title">Choose a CT slice</h2>
+              <p>PNG, JPEG, or single-frame DICOM</p>
+            </div>
+          </div>
+
+          <form id="upload-form">
+            <label class="dropzone" id="dropzone" for="image">
+              <span class="drop-icon" aria-hidden="true">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="drop-main">Choose a file or drag it here</span>
+              <span class="drop-sub">One slice per request · .png, .jpg, .jpeg, .dcm, .dicom</span>
+              <input class="visually-hidden" id="image" name="file" type="file" accept=".png,.jpg,.jpeg,.dcm,.dicom" aria-required="true" aria-describedby="file-help">
+            </label>
+            <span id="file-help" class="visually-hidden">Choose one PNG, JPEG, or single-frame DICOM slice.</span>
+
+            <div id="file-selected" class="file-selected" hidden>
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 3h7l5 5v12a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" stroke="#52687b" stroke-width="1.6" stroke-linejoin="round"/><path d="M14 3v5h5M8 13h8m-8 4h8" stroke="#52687b" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <div class="file-copy">
+                <p class="file-name" id="file-name"></p>
+                <p class="file-size" id="file-size"></p>
+              </div>
+              <button class="icon-button" id="clear-file" type="button" aria-label="Remove selected file" title="Remove selected file">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+
+            <div class="field">
+              <label for="api-key">API key <span style="color: var(--muted); font-weight: 500">(if your administrator gave you one)</span></label>
+              <input class="text-input" id="api-key" type="password" autocomplete="off" placeholder="Leave blank if not required">
+              <p class="field-hint">The key is sent with this request and is not saved by this page.</p>
+            </div>
+
+            <div class="form-actions">
+              <button class="primary-button" id="submit" type="submit">
+                <span id="submit-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-3.8-7-10V5l7-2 7 2v5c0 6.2-7 10-7 10Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9 11 2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span id="submit-label">Classify slice</span>
+              </button>
+              <span class="privacy-note">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                The server does not save uploaded images
+              </span>
+            </div>
+          </form>
+          <div class="status-message" id="status" role="status" aria-live="polite" aria-atomic="true"></div>
+        </section>
+
+        <aside class="panel info-panel" aria-labelledby="how-title">
+          <div class="section-heading">
+            <span class="step-number" aria-hidden="true">02</span>
+            <div>
+              <h2 id="how-title">What to expect</h2>
+              <p>A transparent, research-only result</p>
+            </div>
+          </div>
+          <p>The model compares the slice with three categories. It does not inspect a full scan or create radiology findings.</p>
+          <ol class="steps">
+            <li>
+              <span class="step-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span><strong>Upload one slice</strong><span>Your image is processed for this request and not stored by the app.</span></span>
+            </li>
+            <li>
+              <span class="step-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 19V5m0 14h16M8 15l3-4 3 2 5-7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span><strong>Review category scores</strong><span>Scores describe the model’s output, not a medical probability.</span></span>
+            </li>
+            <li>
+              <span class="step-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3 20 6v5c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V6l8-3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 12h6m-3-3v6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+              <span><strong>Use professional review</strong><span>A radiologist should interpret the full scan and clinical context.</span></span>
+            </li>
+          </ol>
+        </aside>
+      </div>
+
+      <section class="results" id="results" aria-labelledby="results-title" tabindex="-1" hidden>
+        <div class="results-topline">
+          <div>
+            <h2 id="results-title">Classification report</h2>
+            <p>A readable summary of this model response</p>
+          </div>
+          <span class="research-tag">Model output · not a diagnosis</span>
+        </div>
+
+        <div class="result-grid">
+          <article class="panel result-card">
+            <p class="result-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 20 6v5c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V6l8-3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+              Highest model category
+            </p>
+            <div class="classification">
+              <h3 id="predicted-class">—</h3>
+              <span class="category-badge" id="category-badge">Model category</span>
+            </div>
+            <p class="summary-copy" id="human-summary"></p>
+            <div class="confidence-box">
+              <span class="confidence-label">Model confidence for this category</span>
+              <strong class="confidence-value" id="confidence-value">—</strong>
+            </div>
+            <p class="small-note">This score is the model’s output for the selected category. It is not a calibrated probability that a person has a disease.</p>
+          </article>
+
+          <article class="panel result-card probability-card">
+            <h3>Scores for all categories</h3>
+            <p class="probability-intro">The bars show how the model distributed its scores for this slice.</p>
+            <div class="probability-list" id="probability-list"></div>
+          </article>
+        </div>
+
+        <aside class="result-caution">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 21 19H3L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9v4m0 3h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <p><strong>This result cannot confirm or rule out a condition.</strong> It is based on one image slice, not the full study. Please have the complete study reviewed by a qualified radiologist.</p>
+        </aside>
+
+        <details class="panel details-panel" id="technical-details">
+          <summary>Technical details</summary>
+          <div class="details-body">
+            <dl class="technical-grid">
+              <div class="technical-item"><dt>Model version</dt><dd id="model-version">Not provided</dd></div>
+              <div class="technical-item"><dt>Generated at</dt><dd id="generated-at">Not provided</dd></div>
+            </dl>
+            <p class="technical-report" id="technical-report"></p>
+          </div>
+        </details>
+
+        <details class="panel details-panel" id="raw-details">
+          <summary>Raw JSON response</summary>
+          <div class="details-body">
+            <div class="raw-toolbar">
+              <p>Formatted response for technical review</p>
+              <div class="raw-actions">
+                <button class="secondary-button" type="button" id="copy-json">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="1.6"/></svg>
+                  Copy JSON
+                </button>
+                <button class="secondary-button" type="button" id="download-json">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v3h14v-3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Download JSON
+                </button>
+              </div>
+            </div>
+            <div class="json-viewer" id="json-viewer" role="region" aria-label="Pretty-printed JSON response" tabindex="0"></div>
+            <p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
+          </div>
+        </details>
+      </section>
+    </main>
+
+    <footer>
+      <p>Research software only · Not validated for clinical diagnosis or treatment decisions · No uploaded image is saved by this service.</p>
+    </footer>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const form = document.querySelector("#upload-form");
+      const fileInput = document.querySelector("#image");
+      const dropzone = document.querySelector("#dropzone");
+      const status = document.querySelector("#status");
+      const submitButton = document.querySelector("#submit");
+      const submitLabel = document.querySelector("#submit-label");
+      const submitIcon = document.querySelector("#submit-icon");
+      const resultSection = document.querySelector("#results");
+      const fileSelected = document.querySelector("#file-selected");
+      const resultsData = { json: null, formatted: "" };
+      const allowedExtensions = new Set(["png", "jpg", "jpeg", "dcm", "dicom"]);
+      const categoryClass = { Normal: "normal", Benign: "benign", Malignant: "malignant" };
+
+      function setStatus(message, state = "") {
+        status.textContent = message;
+        status.dataset.state = state;
+      }
+
+      function fileExtension(filename) {
+        const separator = filename.lastIndexOf(".");
+        return separator < 0 ? "" : filename.slice(separator + 1).toLowerCase();
+      }
+
+      function formatBytes(bytes) {
+        if (!Number.isFinite(bytes) || bytes < 0) return "File size unavailable";
+        if (bytes < 1024) return `${bytes} bytes`;
+        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+      }
+
+      function setSelectedFile(file, announce = true) {
+        if (!file) {
+          fileInput.value = "";
+          fileSelected.hidden = true;
+          if (announce) setStatus("Selected file removed.");
+          return false;
+        }
+        if (!allowedExtensions.has(fileExtension(file.name))) {
+          fileInput.value = "";
+          fileSelected.hidden = true;
+          setStatus("Choose a PNG, JPEG, or single-frame DICOM file.", "error");
+          return false;
+        }
+        document.querySelector("#file-name").textContent = file.name;
+        document.querySelector("#file-size").textContent = formatBytes(file.size);
+        fileSelected.hidden = false;
+        if (announce) setStatus("File ready. Select “Classify slice” to continue.");
+        return true;
+      }
+
+      fileInput.addEventListener("change", () => setSelectedFile(fileInput.files[0]));
+      document.querySelector("#clear-file").addEventListener("click", () => setSelectedFile(null));
+
+      ["dragenter", "dragover"].forEach((eventName) => {
+        dropzone.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          dropzone.classList.add("is-dragging");
+        });
+      });
+      ["dragleave", "drop"].forEach((eventName) => {
+        dropzone.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          dropzone.classList.remove("is-dragging");
+        });
+      });
+      dropzone.addEventListener("drop", (event) => {
+        const file = event.dataTransfer && event.dataTransfer.files[0];
+        if (!file) return;
+        const transfer = new DataTransfer();
+        transfer.items.add(file);
+        fileInput.files = transfer.files;
+        setSelectedFile(file);
+      });
+
+      function setLoading(isLoading) {
+        submitButton.disabled = isLoading;
+        form.setAttribute("aria-busy", String(isLoading));
+        submitLabel.textContent = isLoading ? "Processing slice…" : "Classify slice";
+        submitIcon.innerHTML = isLoading
+          ? '<span class="spinner" aria-hidden="true"></span>'
+          : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 20 6v5c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V6l8-3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9 11 2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      }
+
+      function percent(value) {
+        const number = Number(value);
+        if (!Number.isFinite(number) || number < 0 || number > 1) {
+          throw new Error("The server returned an invalid category score.");
+        }
+        return number * 100;
+      }
+
+      function readablePercent(value) {
+        return `${percent(value).toLocaleString(undefined, { maximumFractionDigits: 2 })}%`;
+      }
+
+      function summaryFor(category) {
+        const explanations = {
+          Normal: "The model assigned its highest score to the Normal category.",
+          Benign: "The model assigned its highest score to the Benign category.",
+          Malignant: "The model assigned its highest score to the Malignant category. This does not confirm cancer.",
+        };
+        return `${explanations[category] || `The model assigned its highest score to the ${category} category.`} This is a model classification of one slice, not a diagnosis. It cannot rule a condition in or out; have the complete study reviewed by a qualified radiologist.`;
+      }
+
+      function renderProbabilities(probabilities, predictedClass) {
+        if (!probabilities || typeof probabilities !== "object" || Array.isArray(probabilities)) {
+          throw new Error("The server response did not include category scores.");
+        }
+        const list = document.querySelector("#probability-list");
+        list.replaceChildren();
+        Object.entries(probabilities).forEach(([category, value]) => {
+          const score = percent(value);
+          const item = document.createElement("div");
+          const heading = document.createElement("div");
+          heading.className = "probability-heading";
+          const label = document.createElement("span");
+          label.textContent = category === predictedClass ? `${category} · highest score` : category;
+          const amount = document.createElement("strong");
+          amount.textContent = readablePercent(value);
+          heading.append(label, amount);
+
+          const track = document.createElement("div");
+          track.className = "bar-track";
+          track.setAttribute("role", "img");
+          track.setAttribute("aria-label", `${category}: ${readablePercent(value)}`);
+          const fill = document.createElement("div");
+          fill.className = `bar-fill ${categoryClass[category] || ""}`.trim();
+          fill.style.width = `${Math.min(100, Math.max(0, score))}%`;
+          track.append(fill);
+          item.append(heading, track);
+          list.append(item);
+        });
+      }
+
+      function formatTimestamp(value) {
+        if (typeof value !== "string" || !value) return "Not provided";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return value;
+        return new Intl.DateTimeFormat(undefined, {
+          dateStyle: "medium",
+          timeStyle: "short",
+        }).format(date);
+      }
+
+      function appendHighlightedJson(container, jsonText) {
+        const tokenPattern = /("(?:\\.|[^"\\])*"(?=\s*:)|"(?:\\.|[^"\\])*"|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?|\b(?:true|false|null)\b)/g;
+        container.replaceChildren();
+        jsonText.split("\n").forEach((line, index) => {
+          const row = document.createElement("div");
+          row.className = "json-line";
+          const number = document.createElement("span");
+          number.className = "line-number";
+          number.setAttribute("aria-hidden", "true");
+          number.textContent = String(index + 1);
+          const content = document.createElement("span");
+          content.className = "json-content";
+
+          let cursor = 0;
+          tokenPattern.lastIndex = 0;
+          let match;
+          while ((match = tokenPattern.exec(line)) !== null) {
+            content.append(document.createTextNode(line.slice(cursor, match.index)));
+            const token = document.createElement("span");
+            const value = match[0];
+            const isKey = value.startsWith('"')
+              && /^\s*:/.test(line.slice(match.index + value.length));
+            token.className = value.startsWith('"')
+              ? (isKey ? "json-key" : "json-string")
+              : (/^-?\d/.test(value) ? "json-number" : "json-literal");
+            token.textContent = value;
+            content.append(token);
+            cursor = match.index + value.length;
+          }
+          content.append(document.createTextNode(line.slice(cursor)));
+          row.append(number, content);
+          container.append(row);
+        });
+      }
+
+      function renderResult(payload) {
+        if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+          throw new Error("The server returned an unexpected response.");
+        }
+        if (typeof payload.predicted_class !== "string" || !payload.predicted_class.trim()) {
+          throw new Error("The server response did not include a predicted category.");
+        }
+        const confidence = percent(payload.confidence);
+        const category = payload.predicted_class;
+        const badge = document.querySelector("#category-badge");
+        document.querySelector("#predicted-class").textContent = category;
+        badge.className = `category-badge ${categoryClass[category] || ""}`.trim();
+        badge.textContent = "Model category";
+        document.querySelector("#human-summary").textContent = summaryFor(category);
+        document.querySelector("#confidence-value").textContent = readablePercent(payload.confidence);
+        renderProbabilities(payload.probabilities, category);
+        document.querySelector("#model-version").textContent = payload.model_version || "Not provided";
+        document.querySelector("#generated-at").textContent = formatTimestamp(payload.generated_at);
+        document.querySelector("#technical-report").textContent = payload.report_text || "No additional report text was provided.";
+
+        resultsData.json = payload;
+        resultsData.formatted = JSON.stringify(payload, null, 2);
+        appendHighlightedJson(document.querySelector("#json-viewer"), resultsData.formatted);
+        document.querySelector("#copy-status").textContent = "";
+        resultSection.hidden = false;
+        resultSection.focus({ preventScroll: true });
+        const scrollBehavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth";
+        resultSection.scrollIntoView({ behavior: scrollBehavior, block: "start" });
+        setStatus("The model response is ready to review.", "success");
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const file = fileInput.files[0];
+        if (!file) {
+          setStatus("Choose an image file before continuing.", "error");
+          fileInput.focus();
+          return;
+        }
+        if (!setSelectedFile(file, false)) return;
+
+        setLoading(true);
+        setStatus("Uploading and classifying the slice. This may take a moment.", "loading");
+        resultSection.hidden = true;
+        const body = new FormData();
+        body.append("file", file);
+        const headers = {};
+        const apiKey = document.querySelector("#api-key").value.trim();
+        if (apiKey) headers["X-API-Key"] = apiKey;
+
+        try {
+          const response = await fetch("/api/v1/classify", { method: "POST", headers, body });
+          let payload;
+          try {
+            payload = await response.json();
+          } catch (_error) {
+            throw new Error("The server returned an unreadable response. Please try again.");
+          }
+          if (!response.ok) {
+            const messages = {
+              401: "The API key was not accepted. Check it and try again.",
+              400: "The image could not be read. Check that it is a valid supported slice and try again.",
+              413: "This file is larger than the server allows. Choose a smaller file.",
+              415: "This file type is not supported. Choose a PNG, JPEG, or DICOM slice.",
+              503: "The model is not ready. Please contact the project administrator.",
+            };
+            const detail = typeof payload.detail === "string" ? payload.detail : "The request could not be completed.";
+            throw new Error(messages[response.status] || detail);
+          }
+          renderResult(payload);
+        } catch (error) {
+          resultSection.hidden = true;
+          const message = error instanceof TypeError
+            ? "Could not reach the server. Check that the application is running and try again."
+            : error.message || "Something went wrong. Please try again.";
+          setStatus(message, "error");
+        } finally {
+          setLoading(false);
+        }
+      });
+
+      async function copyJson() {
+        if (!resultsData.formatted) return;
+        try {
+          await navigator.clipboard.writeText(resultsData.formatted);
+        } catch (_error) {
+          const temporary = document.createElement("textarea");
+          temporary.value = resultsData.formatted;
+          temporary.setAttribute("readonly", "");
+          temporary.style.position = "fixed";
+          temporary.style.opacity = "0";
+          document.body.append(temporary);
+          temporary.select();
+          const copied = document.execCommand("copy");
+          temporary.remove();
+          if (!copied) {
+            document.querySelector("#copy-status").textContent = "Copy is unavailable in this browser.";
+            return;
+          }
+        }
+        document.querySelector("#copy-status").textContent = "JSON copied to clipboard.";
+      }
+
+      document.querySelector("#copy-json").addEventListener("click", copyJson);
+      document.querySelector("#download-json").addEventListener("click", () => {
+        if (!resultsData.formatted) return;
+        const blob = new Blob([resultsData.formatted], { type: "application/json;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "lung-ct-classification.json";
+        document.body.append(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+        document.querySelector("#copy-status").textContent = "JSON download started.";
+      });
+    })();
+  </script>
+</body>
+</html>

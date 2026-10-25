@@ -1,0 +1,247 @@
+Unified Vision-Language Model for Lung Cancer Diagnosis
+Om Shewale
+Research Scholar, MCA
+Thakur Institute of Management Studies, Career Development & Research (TIMSCDR)
+Mumbai, India 
+omshewale28@gmail.com
+Thara chakkingal
+Faculty, Dept. of Computer Applications
+ Thakur Institute of Management Studies, Career Development & Research, Mumbai,
+ Maharashtra, India 
+thara.naveen @timscdrmumbai.in
+Abstract Lung cancer is a primary cause of cancer death globally and accounts for one of the highest rates of mortality among all cancer types. The significant fatality rate from lung cancer is predominantly due to late-stage discovery of the disease and lack of immediate medical intervention. Therefore, efficient and accurate detection of lung cancer plays a vital role in improving a patient’s chance of survival. The typical manual workflow used to diagnose lung cancer from CT scans is not only slow but also prone to human error and produces results with low repeatability, especially in healthcare systems with limited resources. Therefore, in this project we aim to provide a solution to automate the detection of lung cancer as well as report generation using a vision-language framework.
+We introduce a custom CNN architecture for classifying lung CT scans. The network efficiently learns image features through multiple levels of convolutions and pooling to generate optimal classifications of the input images. Alongside this, we propose to leverage a pre-trained GPT-based LLM to automate the report generation workflow. By finetuning this LLM with the output of our CNN, we hope to facilitate vision-language fusion by allowing image-to-text prompt options.
+Methods: In this paper, we design, train, and evaluate our custom CNN to classify images as positive or negative for lung cancer. In future work, we will extract features from our image classification network and perform vision-language fusion through the LLM to generate unique reports. We believe that AI can help automate tedious tasks present in medical imaging workflows. Our proposed framework aims to reduce redundancy and provide an extensible and modular solution to healthcare providers. We demonstrate the efficacy of our CNN by
+training and testing on publicly available lung cancer datasets. Our model reaches an accuracy of a comprehensive, multi-modal diagnostic system that promises to improve diagnostic accuracy, reduce variability, and enhance efficiency in clinical settings.
+Keywords: Generative AI, medical imaging, LLMs, X-ray, CT scan, MRI scan, computer vision, diagnostics
+I. Introduction
+Lung cancer is one of the leading causes of death across the world, killing more than 1.8 million people every year. While technology has provided us many amazing tools to view the inside of our bodies, like CT scans, much of the manual interpretation is still done by humans. Diagnosis of chest X-rays is a highly manual, laborious task that is prone to high intervariability and errors. Distinguishing between normal, benign and malignant cases is a challenging task.
+Much work has been done in implementing AI in medical imaging pipelines to reduce manual workload and improve performance. Vision-based tasks like image classification are well suited for traditional computer vision models. But we can pair vision with large language models (LLMs) to automatically generate diagnostic reports. There have been some solutions that aim to combine both of these modalities, but not many provide a unified solution.
+In this project, we aim to provide a solution combining a custom CNN model to classify CT scans along with a GPT-based LLM to generate the reports. We intend to architect a system to assist doctors in not only providing accurate classifications but also rich context-aware diagnostic reports. The first phase will provide us a strong CNN-based architecture to classify images. The next step would be to work on vision-language fusion.
+II. Literature Survey
+Table I. Literature Survey
+Sr. No
+Title of Paper
+Methodology
+Strengths
+Research Gaps
+1
+Real-Time Detection of Lung Cancer Using CNN
+The proposed model uses a CNN to analyze CT scan images in real-time. Preprocessing methods such as noise removal, normalization, and histogram equalization were used and optimized. The CNN model has been optimized to work with low latency so that it can analyze CT scans and provide predictions quickly (in seconds).
+The real-time feature works quite well in helping with the workflow during emergencies, where critical cases can be easily sorted out. High sensitivity helps detect any slightest pattern of cancer in the CT scan. The model also has efficient preprocessing techniques, making it adaptable to various image sources.
+Needs further verification using other varied data sets from diverse patients and scanning equipment. The effect of degraded image quality, for example, due to motion artifacts or low-resolution images, on diagnostic accuracy needs further assessment.
+2
+Lung Cancer Intelligent Prediction System Using CNN
+In this study, the authors designed a probabilistic CNN framework trained on 2D CT images. This framework implements the concept of noise reduction and probabilistic scoring that helps improve sensitivity and recall. Augmentation techniques, such as flipping and rotation, have been used to create variations similar to those encountered in real life.
+The probabilistic results give clinicians a certain amount of assurance in making their decisions. The very high level of recall (92%) guarantees that even borderline cases will be considered, thus lowering the chance of missing out on a diagnosis. The presence of confidence indicators brings the algorithm closer to clinical practice.
+Though successful in analyzing two-dimensional CT images, the algorithm does not have any capability for working with three-dimensional data used in cancer detection. The research does not touch upon multi-modal integration in terms of the patient's medical history and biomarkers.
+3
+Early Lung Cancer Detection Using CNN
+This work explored CNN-based architectures for detecting early-stage lung cancer. The model was trained on a curated dataset of CT scans, with preprocessing steps tailored to enhance low-contrast nodules. Data augmentation techniques were extensively applied to ensure generalization across unseen cases. The model achieved robust performance in detecting early malignant changes.
+Highlights the power of CNNs for improving early detection and increasing survival chances of patients. The preprocessing and augmentation technique is highly effective against the variations encountered in practice. The system targets early nodules, an essential area neglected in previous approaches to lung cancer screening.
+Scalability is an issue since the study has used curated data sets that do not reflect reality. The real-time applicability of the algorithm has not been assessed.
+4
+Enhancing Lung Cancer Diagnosis with Data Fusion and Mobile Edge Computing
+In this research, CNN diagnostics are used along with data fusion methods to fuse CT scan images with patient information. The research utilizes mobile edge computing, which enables data processing on the local device. The CNN algorithm is modified to operate effectively on hardware-constrained devices.
+Integration of image data with metadata to achieve a complete insight for diagnosis. Ability to deploy in rural or low-resource settings for democratization of diagnosis services. Designed for mobile and edge devices to minimize dependence on cloud computing.
+There is little validation in terms of performance through large-scale clinical studies, which makes the system not widely applicable. Adapting to the changing hardware setup in mobile edge computing is one of the problems.
+5
+LCDctCNN: Lung Cancer Diagnosis Using a CNN-Based Model
+This study has put forth a CNN model that has been compared to other network models including ResNet50 and Xception. The focus of the study was on balanced metrics and achieving high accuracy, recall, and AUC values, which are 92%, 91.72%, and 98.21%, respectively.
+Excellent metrics show the efficiency of the model. Interpretability is part of the pipeline, allowing doctors to verify results of the CNN. Outperforms conventional deep learning models and other approaches, which proves its clinical significance.
+Limited dataset size impacts the generalization capability of the machine learning model in different patient groups and imaging situations. The incorporation of multimodal imaging data (like MRI and PET images) has not been attempted at all.
+6
+Deep Machine Learning for Medical Diagnosis: Application to Lung Cancer
+Examined a mixed method that integrates conventional feature extraction (such as texture features) with deep CNN architecture. Early and late fusion strategies were used to combine the benefits of both methods. The proposed model showed promising sensitivity results (88%-94%) on various data sets.
+Combines well traditional engineering with deep learning to cope with limitations of datasets. Sensitivity of the model allows detecting small cancerous changes, which are not detectable manually. The design of the system is modular, thus allowing the addition of new data types (e.g., genetic/biochemical).
+There is still a danger of overfitting because of the small size of samples in some data sets. Inadequate testing for rare cancer types and late stages of the disease.
+A. Research Gap
+Medical AI lung cancer classification using convolutional neural networks is one of the fastest-growing areas. However, there are still several fundamental challenges limiting its potential practical implementation in clinical settings. The main limitations are the dependence on resources like LIDC-IDRI and LUNA16, which are widely used and hence inherently limiting in terms of diversity. These datasets often represent specific imaging conditions (e.g., CT scans acquired under controlled settings) and may not capture the variability of populations, imaging protocols, or disease presentations found in real-world clinical settings. This lack of diversity results in models that struggle to generalize when applied to heterogeneous clinical data, leading to unreliable performance across different patient populations. Moreover, CNNs are largely static-image-driven, thus limiting their ability to analyze longitudinal data that are critical for tracking disease progression. Such temporal analysis is especially important in lung cancer because the changes in size, shape, or density of a nodule can be extremely useful in diagnosis and prognosis. In addition to the technical barriers, opacity to CNN models is a major stumbling block for clinical adoption. Despite their ability to produce high diagnostic accuracy, their "black box" nature prevents clinicians from understanding how the models actually arrive at specific predictions. This lack of interpretability creates a trust gap in that clinicians are unlikely to rely on systems without having clear, actionable insights into their decision-making processes. Addressing these limitations will require substantial advancements in dataset development, model design, and interpretability-focused research.
+The field of fully automated report generation with GPT-based LLMs also displays stark limitations, especially for taking multimodal inputs in such a way that combines information from visual data as well as textual information. Of course, LLMs like GPT have had astonishing fluency and coherence in generating human-like text; their actual clinical utility is limited by the inability to fully integrating with image-derived data seamlessly. Current implementations tend to separate the image analysis and text generation as separate processes, so minimal interaction is provided between the two. In turn, generated reports capture some textual patterns but cannot properly contextualize critical findings from the images from CT or X-rays, thus reducing the reports' diagnostic accuracy and relevance. For example, although these systems may perform well at summarizing pre-annotated textual datasets, they tend to miss subtle image features that play a crucial role in identifying conditions such as early-stage lung cancer. Furthermore, the training datasets used, such as CheXpert and IU X-Ray, are often prepared for narrow tasks and lack multimodal annotations that capture the interplay between imaging findings and clinical narratives. This poses challenges in extending these models to broader clinical applications or more complex imaging modalities, such as MRI or PET scans, that require a deeper understanding of both visual and contextual data. Moreover, these systems fail to account for the hierarchical nature of medical reporting, where a combination of descriptive observations, differential diagnoses, and actionable recommendations must be seamlessly integrated. These gaps highlight the critical necessity of innovative approaches to multimodal learning in which text and image data are jointly analyzed, culminating in comprehensive, clinically meaningful reports.
+Vision-language fusion, which seeks the combination of visual and textual data for enhanced diagnostics, represents a promising but, however, underdeveloped domain in medical AI. Most of the current methods used in vision-language integration are based on rather basic methods, such as output concatenation from independent vision and language models, failing to capture the rich multidimensional relationships between image features and textual descriptions. This simplistic integration often results in systems that can perform basic tasks, such as captioning an image with general observations, but lack the depth needed for complex diagnostic scenarios, where subtle visual patterns must be linked to specific clinical findings. For example, identifying a small nodule in a CT scan and correlating it with potential malignancy based on patient history requires a much deeper fusion of data modalities than current systems can achieve. Another significant gap in this area is the limited ability of models to generalize across different medical domains or imaging modalities. Systems trained on chest X-rays, for example, often fail miserably when applied to CT scans or MRI data, largely due to the lack of strong transfer learning techniques that could adapt models to new tasks or datasets without significant retraining. Moreover, vision-language fusion systems often cannot be used to incorporate clinical metadata, such as patient demographics or previous medical history, which could significantly enhance their diagnostic capabilities. Addressing these limitations will require not only advanced fusion techniques, such as multimodal transformers or attention-based architectures, but also the development of datasets that capture the complexity and diversity of real-world clinical scenarios.
+Scalability and computational efficiency are additional challenges to the deployment of AI systems in medical imaging. State-of-the-art deep learning models are powerful but computationally expensive, requiring high-end hardware such as GPUs or TPUs, significant memory, and energy resources. Such requirements make them infeasible for many healthcare environments, especially low-resource settings where such infrastructure is not available. The problem of scalability is exacerbated when dealing with large, high-resolution medical imaging datasets, where processing time and computational costs can become prohibitive. Another significant challenge is the flexibility of existing models to adapt to new imaging technologies or clinical workflows. For example, a new generation of high-resolution CT scanners often requires the retraining or redesign of existing models, a time-consuming and resource-intensive process. These challenges compound with the need to comply with regulatory requirements and ensure patient data privacy that often require additional layers of security and auditing, further increasing the computational burden. These scalability issues will be overcome with innovation in model optimization: light architectures that operate well on limited hardware and advance in transfer learning, so that models can easily adapt to new datasets or imaging modalities without considerable retraining.
+Future research has to focus on the development of robust, adaptable, and efficient AI systems tailored to the complexities of medical diagnostics. The generation of diverse, high-quality datasets reflecting variability in the real world would be critical for lung cancer classification, as well as designing models that incorporate longitudinal data to track disease progression over time. In generating reports automatically, advanced multimodal learning techniques will integrate visual and textual data to enable comprehensive, context-aware diagnostic reports. Vision-language fusion systems could benefit from newer architectures like transformers designed with cross-modal understanding in mind and better suited to link features of an image with the insights textual. Finally, scalability is going to depend on building computationally efficient models and methods for rapid adaptation to new imaging technologies. These advances will not only enhance the accuracy and dependability of AI systems but also make them universally acceptable in different healthcare environments, leading to improved diagnostic results and patient care around the globe.
+III. Problem Definition
+This section provides an overview of the critical challenges this project aims to solve in the domain of lung cancer diagnosis and report generation. It outlines some of the current inefficiencies associated with the healthcare industry's reliance on manual CT scan analysis, which is primarily characterized by the limitations of traditional methods in providing accurate, timely, and consistent results. Current approaches often involve substantial manual labor, subjectivity in interpretation, and delayed diagnostics, all of which are time-consuming and prone to human error. This project introduces an AI-driven solution that aims to automate lung cancer detection and generate diagnostic reports efficiently. The primary goal is to provide a system capable of classifying lung CT scans into relevant categories and generating comprehensive, context-aware reports, thus making the diagnostic process faster, more accurate, and cost-efficient.
+A. Definitions
+1) Lung Cancer Diagnosis: The process of identifying and classifying lung cancer through medical imaging, typically using CT scans, X-rays, or MRI scans. The diagnosis involves detecting abnormalities and determining whether they are benign or malignant.
+2) CT Scan: A medical imaging technique that uses X-rays to create detailed cross-sectional images of the body, widely used to detect lung cancer and other diseases.
+3) Benign: A non-cancerous tumor or lesion. Benign growths typically do not spread to other parts of the body.
+4) Malignant: A cancerous tumor or growth that can invade surrounding tissues and spread to other parts of the body, making it more dangerous than benign tumors.
+5) Convolutional Neural Network (CNN): A class of deep neural networks that are particularly powerful for analyzing visual data. CNNs are commonly used for image classification tasks in computer vision applications, such as lung cancer detection.
+6) Large Language Model (LLM): A type of machine learning model trained to understand and generate human language. GPT-based models are examples of LLMs used for generating text based on given input data.
+7) Automated Report Generation: The process of using AI to generate written diagnostic reports from medical data, such as CT scan images. In this project, LLMs are used to generate contextual, accurate reports based on the features extracted by the CNN model.
+B. Problem Statement
+The detection of lung cancer from medical imaging, particularly CT scans, remains one of the most complex challenges in modern healthcare. Despite advancements in diagnostic technologies, the process of identifying malignant tumors early is still heavily dependent on the expertise and judgment of radiologists, leading to variability, delays, and potential misdiagnoses. Current methods for analyzing CT scans are not only time-consuming but also prone to human error, especially when distinguishing between benign and malignant lesions, leading to missed diagnoses or unnecessary treatments. Furthermore, with the increasing volume of medical imaging data, healthcare professionals often face significant challenges in maintaining efficiency and accuracy when interpreting scans.
+This project seeks to address these challenges by introducing an AI-driven solution that combines computer vision and language models for lung cancer classification and report generation.
+The main issues this project addresses are:
+1) Lung Cancer Classification: The process of manually analyzing CT scans to classify them into Normal, Benign, or Malignant categories is time-intensive and error-prone. A robust AI solution is required to automate this task and achieve high accuracy in classifying medical images.
+2) Automated Report Generation: Currently, diagnostic reporting is a manual and laborious process where radiologists must not only interpret the images but also draft comprehensive reports. The challenge lies in creating an AI system capable of generating detailed, structured, and context-aware diagnostic reports directly from the image data, reducing the burden on healthcare professionals.
+3) Vision-Language Integration: The lack of integration between image classification and report generation in most AI systems for lung cancer diagnosis is a critical gap. The ability to fuse features from medical images with natural language processing models could lead to more accurate and informative diagnostic reports, providing a seamless and holistic diagnostic solution.
+4) Scalability and Efficiency: Despite the success of AI models in research, most existing systems struggle with scalability and efficiency in real-world applications. Processing large datasets of medical images and generating reports in a timely manner remains a significant challenge. The system needs to be optimized to handle large-scale data while ensuring fast and reliable results.
+These challenges highlight the need for an AI-driven, fully integrated solution that can automate the classification of lung CT scans, generate detailed reports, and integrate various medical data sources efficiently. By combining computer vision and language models, this system aims to enhance diagnostic accuracy, reduce human error, and improve clinical efficiency, ultimately helping to revolutionize the lung cancer diagnostic workflow.
+IV. Objectives
+This section outlines the primary objectives of the proposed AI-driven framework for lung cancer detection and automated report generation. The aim is to develop a comprehensive solution that not only enhances diagnostic accuracy but also reduces the time and effort involved in interpreting CT scans and generating detailed reports. The key objectives of this project are as follows:
+1) Lung Cancer Classification: The first objective is to design and develop a custom Convolutional Neural Network (CNN) optimized for classifying lung CT scans into three categories: Normal, Benign, and Malignant. The system should be capable of accurately distinguishing between these categories, providing reliable results that can support clinical decision-making. The goal is to achieve high classification accuracy with minimal computational overhead, ensuring that the system is efficient enough for real-time clinical use.
+2) Automated Report Generation: The second objective is to integrate an automated report generation mechanism using GPT-based Large Language Models (LLMs). Once the lung CT scan has been classified, the system will automatically generate a detailed diagnostic report based on the classification results. These reports will be contextually relevant, containing insights derived from the image features, such as the presence of nodules, their size, and other critical attributes. The reports should be comprehensive yet understandable to both medical professionals and patients, reducing the manual effort required in writing diagnostic summaries.
+3) Vision-Language Fusion: The third objective is to explore the fusion of vision and language models to improve the diagnostic report generation process. By integrating the image-derived features with the LLM's textual capabilities, the system will be able to generate more accurate, context-aware reports. This fusion will allow the system to produce reports that are not only based on image classification but also incorporate contextual information from the generated text, leading to better-informed decisions.
+4) Scalability and Efficiency: Ensuring that the solution can scale efficiently and operate on large datasets is a key objective. Given the increasing volume of medical imaging data, the system should be designed to handle large-scale CT scan datasets while maintaining high throughput and accuracy. The framework must be optimized for real-time analysis to be practically deployed in clinical settings. Additionally, the system must be adaptable to other imaging modalities like X-rays and MRI scans, paving the way for broader applications in medical diagnostics.
+These objectives collectively aim to address the challenges in current lung cancer diagnosis workflows by introducing a fully automated, AI-driven system that integrates both image classification and text generation in a seamless, efficient, and scalable manner. By achieving these goals, the system will not only improve diagnostic accuracy but also enhance clinical efficiency, reduce the risk of human error, and facilitate faster decision-making in lung cancer diagnosis.
+V. Methodology
+The methodology outlines the step-by-step approach to designing, developing, and evaluating the AI-driven framework for lung cancer detection and automated report generation. The framework integrates a custom Convolutional Neural Network (CNN) for image classification. The key stages of this methodology are as follows:
+A. Data Collection and Preprocessing
+The first step involves gathering a comprehensive dataset of lung CT scan images and diagnostic reports. For training and testing the CNN, high-quality annotated datasets such as IQOTHNCCD-LUNG-CANCER-DATASET or other publicly available datasets are used.
+Preprocessing Steps:
+1) Color Correction (RGB Conversion): Since OpenCV reads images in BGR format by default, we convert the color image from BGR to RGB using cv2.cvtColor(). This ensures that the color channels are correctly aligned for further processing or visualization.
+2) Resizing: The image is resized to a fixed size of img_size by img_size (e.g., 256x256 pixels). Resizing is crucial for ensuring that all images in the dataset have the same dimensions, which is a requirement for feeding them into neural networks.
+3) Grayscale Conversion: The resized RGB image is converted to grayscale using cv2.cvtColor(). Grayscale images simplify the task by reducing the number of channels from 3 (RGB) to 1, which can be beneficial for certain image classification tasks, especially when color information is not crucial.
+4) Gaussian Blur: Gaussian blur is applied to smooth the image and reduce noise, which helps improve the performance of subsequent steps like thresholding and feature extraction. The kernel size is set to (5, 5), which controls the degree of smoothing.
+5) Thresholding (Otsu's Method): Otsu's thresholding method is used to segment the image into foreground and background. It automatically calculates an optimal threshold value to separate the pixels based on intensity. The output is a binary image where the foreground (potential cancerous regions) is distinguished from the background.
+6) Normalization: The thresholded image is normalized by dividing all pixel values by 255.0, converting the pixel values to a range of [0, 1]. This step helps standardize the data and ensures that all input values are on the same scale.
+7) Erosion and Dilation (Morphological Operations): Erosion is applied to remove small white regions (noise) from the binary image, which can help in reducing irrelevant details. Dilation is then applied to enhance the remaining features, making them more prominent for further analysis.
+Fig. 1. Preprocessing of Images
+B. Custom CNN Architecture Design
+The CNN model we're using follows a standard CNN architecture with two convolutional layers, followed by max-pooling, flattening, and fully connected layers. The model is designed to classify lung CT scan images into three categories: Normal, Benign, and Malignant.
+Key Steps in CNN Design:
+1) Convolution Layers: Learn features (edges, textures, patterns) from the images.
+2) Max Pooling: Reduce the spatial dimensions to lessen the computational cost.
+3) Flattening: Convert the feature maps into a 1D array for classification.
+4) Dense Layers: Process the learned features and output the classification probabilities using softmax.
+Overall Architecture: The input consists of CT scan images of lung tissues (resized to a uniform size). The network comprises Conv2D + ReLU + MaxPooling blocks (x2), followed by flattening and dense layers for classification. The output produces three classes (Normal, Benign, Malignant).
+Table II. Layers of Custom CNN Architecture
+Layer (type)
+Output Shape
+Param #
+conv2d (Conv2D)
+(None, 254, 254, 64)
+640
+activation (Activation)
+(None, 254, 254, 64)
+0
+max_pooling2d (MaxPooling2D)
+(None, 127, 127, 64)
+0
+conv2d_1 (Conv2D)
+(None, 125, 125, 64)
+36,928
+max_pooling2d_1 (MaxPooling2D)
+(None, 62, 62, 64)
+0
+flatten (Flatten)
+(None, 246016)
+0
+dense (Dense)
+(None, 16)
+3,936,272
+dense_1 (Dense)
+(None, 3)
+51
+C. Training the CNN Model
+The CNN will be trained on the labeled CT scan dataset using the following configuration:
+1) Loss Function (sparse_categorical_crossentropy): Sparse Categorical Crossentropy is used as the loss function since this is a multi-class classification problem where the target labels are integers (not one-hot encoded). This loss function is appropriate when there are more than two classes and the model's output is a probability distribution over all the classes (generated by the softmax activation in the output layer).
+2) Optimizer (adam): Adam (Adaptive Moment Estimation) is used as the optimizer because it combines the benefits of both RMSProp and Momentum. It adapts the learning rate for each parameter, which helps the model converge faster and more effectively. Adam is a popular choice for training deep learning models as it tends to perform well across a variety of tasks.
+3) Metrics (accuracy): Accuracy is used as the evaluation metric during training. This will measure the percentage of correct predictions made by the model across all test samples. Since it's a classification task with multiple classes, accuracy gives us a straightforward measure of how well the model is performing.
+D. Language Model Integration (Future Stage)
+Once the CNN model is trained and capable of classifying lung CT scans accurately, the next step involves integrating a GPT-based Large Language Model (LLM) to generate automated diagnostic reports. The language model will be fine-tuned using a medical corpus of lung cancer reports, allowing it to generate detailed and context-aware reports.
+VI. Data Models
+This section encompasses different types of diagrams, including use case, class, and sequence data flow diagrams to ensure a comprehensive and systematic understanding of the system's design. Each diagram is accompanied by a detailed explanation to highlight its relevance and contribution to the software system.
+A. UML Use Case Diagram
+Fig. 2. Use Case Diagram
+Actors:
+1) Radiologist/Healthcare Professional: The primary user who interacts with the system to upload CT scan images, review classifications, and access diagnostic reports.
+2) AI System: The machine learning model that processes the images, classifies the results, and generates diagnostic reports.
+Use Cases:
+1) Upload CT Scan: The radiologist uploads a CT scan to the system.
+2) Image Preprocessing: The system automatically preprocesses the uploaded image (e.g., resizing, noise reduction).
+3) Classify Image: The system classifies the image as Normal, Benign, or Malignant using the CNN model.
+4) Generate Report: The system generates a detailed diagnostic report based on the classification results.
+5) View Report: The healthcare professional reviews the generated report for further analysis.
+B. UML Sequence Diagram
+Fig. 3. Sequence Diagram for Workflow
+The sequence diagram shows the interaction between the system's components over time. It provides a step-by-step representation of how the system processes the CT scan images and generates the diagnostic report.
+Steps in the Sequence Diagram:
+1) Upload Image: The radiologist uploads the CT scan image to the system.
+2) Preprocess Image: The system preprocesses the image (e.g., resizing, Gaussian blur, thresholding).
+3) Classify Image: The preprocessed image is passed to the CNN model, which classifies the image into one of three categories: Normal, Benign, or Malignant.
+4) Generate Report: Once the image is classified, the system generates a detailed diagnostic report based on the classification result.
+5) View Report: The radiologist views the generated report and takes necessary actions based on the diagnosis.
+C. UML Class Diagram
+Fig. 4. UML Class Diagram
+D. Significance
+Together, these diagrams form the backbone of the system's design, providing both high-level and detailed insights into its operation. They help developers, stakeholders, and system architects ensure that the system is designed correctly, meets user requirements, and is easy to maintain and extend.
+VII. Requirements
+These requirements focus on the technical aspects of the system, including software, hardware, and external systems that need to be integrated.
+A. Software Requirements (Programming Languages and Frameworks)
+1) Backend: Python, with machine learning libraries such as TensorFlow or Keras for model development.
+2) Frontend: HTML, CSS, and JavaScript for the user interface, with frameworks like React or Angular for dynamic rendering.
+3) Database: SQL (PostgreSQL or MySQL) or NoSQL (MongoDB) for storing user data, image metadata, and reports.
+4) Model and Libraries: Convolutional Neural Network (CNN) for image classification using libraries such as TensorFlow, Keras, or PyTorch.
+B. Hardware Requirements
+1) Server: The system should be deployable on cloud platforms (AWS, GCP, or Azure) for scalability, or on-premises servers for healthcare environments with strict data privacy requirements.
+2) GPU Support: The system should support GPU acceleration for faster training and inference of CNN models. Recommended GPUs include Nvidia Tesla or equivalent.
+3) Data Storage: Medical images should be stored in a secure file storage system such as Amazon S3 or an equivalent secure cloud storage service. The system should support metadata storage in a relational database to track patient details, scan dates, and classification results.
+VIII. Architecture
+The architecture of the lung cancer detection and automated report generation system is designed to ensure a seamless flow of data through its various components, combining image processing, classification, and report generation. The system leverages a Convolutional Neural Network (CNN) for lung cancer detection and integrates a Large Language Model (LLM) for generating context-aware diagnostic reports. The architecture includes the following key components:
+Input CT Scan Images: CT scan images are uploaded by the radiologist or healthcare professional. The system supports image formats such as .jpg, .png, or .dicom.
+Preprocessing Module: Image resizing resizes all images to a uniform dimension (e.g., 256x256 pixels); Gaussian blur is applied to reduce noise in the images; color images are converted to grayscale if required; the image is segmented using Otsu's thresholding method and normalized to a range of [0, 1]; and morphological operations (erosion and dilation) enhance the image for further analysis.
+CNN Model: Convolutional layers extract low- and high-level features from the preprocessed images; pooling layers reduce the spatial dimensions of feature maps; fully connected layers flatten the feature maps and map them to the classification probabilities. The output classifies the image into one of three categories: Normal, Benign, or Malignant.
+Feature Extraction and Integration: Extracts the output of the CNN's feature maps and maps them to the input space of the LLM. Combines image-derived features with optional textual prompts for generating detailed diagnostic reports.
+LLM-Based Report Generator: Uses a GPT-based model fine-tuned on medical datasets to generate a comprehensive diagnostic report. Incorporates information such as classification results, tumor characteristics (size, shape, location), and clinical recommendations.
+Output Layer: Displays the class (Normal, Benign, or Malignant) predicted by the CNN, and provides a structured, human-readable diagnostic report containing findings and recommendations.
+The architecture ensures seamless integration of CNN-based classification and LLM-based report generation to automate lung cancer detection and diagnostic reporting. It is designed to be modular, scalable, and adaptable, supporting future enhancements such as the addition of new imaging modalities and real-time decision support features. This architecture provides a robust framework for improving clinical workflows, enhancing diagnostic accuracy, and reducing the workload on radiologists.
+IX. Testcases
+Table III. Testcases
+Test Case ID
+Test Scenario
+Test Case
+Expected Result
+Status (Pass/Fail)
+TC-FUNC-01
+Upload CT scan image
+CT scan image in .jpg, .png, or .dicom format
+Image successfully uploaded to the system and visible in the user interface.
+Pass
+TC-FUNC-02
+Preprocess the uploaded image
+Uploaded CT scan image
+Image resized to 256x256, converted to grayscale, and normalized.
+Pass
+TC-FUNC-03
+Classify the CT scan
+Preprocessed CT scan image
+CNN model outputs a classification: Normal, Benign, or Malignant.
+Pass
+X. Results
+This section provides an overview of the results obtained from the implementation and evaluation of the lung cancer detection system using the custom Convolutional Neural Network (CNN) model. It includes performance metrics for the classification task, an evaluation of the generated reports, and the efficiency of the system in a real-world healthcare setting.
+A. Model Results & Analysis
+Fig. 5. Model Accuracy Chart
+The results from this project show that the AI-driven lung cancer detection system performs effectively across all stages of the diagnostic process.
+Classification accuracy of 90.8% ensures that the system reliably classifies CT scans into Normal, Benign, and Malignant categories.
+These results indicate that the system can be effectively used to assist radiologists in lung cancer diagnosis and reduce the burden of manual report generation, providing quick and accurate results that aid in clinical decision-making.
+XI. Conclusion
+The AI-driven lung cancer detection system has shown promising results in the classification of CT scan images into three categories: Normal, Benign, and Malignant. The Convolutional Neural Network (CNN) model developed for this task has achieved a classification accuracy of 90.8%, which indicates its effectiveness in identifying and classifying lung cancer from medical images. Furthermore, the system was able to generate automated reports based on the classification results, providing clear, actionable insights for healthcare professionals.
+While the current system successfully classifies lung CT scans using a CNN model, several areas for improvement and future development include:
+1) Integration with Large Language Models (LLMs): Future work will focus on incorporating LLMs (e.g., OpenLLM, GPT-3 or GPT-4) to generate more detailed, context-aware diagnostic reports, providing richer insights based on classification results.
+2) Handling Multiple Imaging Modalities: Expanding the system to process X-rays, MRI scans, and other imaging types will make it more versatile, allowing comprehensive cancer detection across different imaging modalities.
+3) Real-Time Decision Support: The system can be enhanced to provide real-time recommendations based on classification results, assisting clinicians with immediate next steps in diagnosis or treatment.
+References
+[1] A. Krizhevsky et al., Convolutional Neural Networks for Image Recognition, 2012.
+[2] A. Radford et al., GPT-2: Language Models are Unsupervised Multitask Learners, 2019.
+[3] A. Leiter, R. R. Veluswamy, and J. P. Wisnivesky, "The global burden of lung cancer: Current status and future trends," Nature Reviews Clinical Oncology, vol. 20, no. 9, pp. 624-639, Sep. 2023.
+[4] H. Alyasriy, "The IQ-OTHNCCD lung cancer dataset," Mendeley Data, V1, doi: 10.17632/bhmdr45bh2.1, Oct. 2020.
+[5] S. G. Armato III et al., "The Lung Image Database Consortium (LIDC) and Image Database Resource Initiative (IDRI): A completed reference database of lung nodules on CT scans," Medical Physics, vol. 38, no. 2, pp. 915-931, Feb. 2011.
+[6] N. Otsu, "A threshold selection method from gray-level histograms," IEEE Transactions on Systems, Man, and Cybernetics, vol. 9, no. 1, pp. 62-66, Jan. 1979.
+[7] R. C. Gonzalez and R. E. Woods, Digital Image Processing, 4th ed. New York, NY, USA: Pearson, 2018.
+[8] Y. LeCun, Y. Bengio, and G. Hinton, "Deep learning," Nature, vol. 521, no. 7553, pp. 436-444, May 2015.
+[9] K. He, X. Zhang, S. Ren, and J. Sun, "Deep residual learning for image recognition," in Proc. IEEE Conf. Computer Vision and Pattern Recognition (CVPR), 2016, pp. 770-778.
+[10] S. K. Lakshmanaprabu, S. N. Mohanty, K. Shankar, N. Arunkumar, and G. Ramirez, "Optimal deep learning model for classification of lung cancer on CT images," Future Generation Computer Systems, vol. 92, pp. 374-382, Mar. 2019.
+[11] S. Ch. Bakchy, A. Rahman, and M. A. Kashem, "A lightweight CNN model for efficient lung cancer detection and Grad-CAM visualization," in Proc. IEEE Int. Conf. Information and Communication Technology for Sustainable Development (ICICT4SD), 2023, pp. 254-258.
+[12] I. Shafi et al., "An effective method for lung cancer diagnosis from CT scan using deep learning-based support vector network," Cancers, vol. 14, no. 21, p. 5457, Oct. 2022.
+[13] C. Zhang et al., "Toward an expert level of lung cancer detection and classification using a deep convolutional neural network," The Oncologist, vol. 24, no. 9, pp. 1159-1165, Sep. 2019.
+[14] A. Vaswani et al., "Attention is all you need," in Advances in Neural Information Processing Systems (NeurIPS), vol. 30, 2017, pp. 5998-6008.
+[15] H. Liu, C. Li, Q. Wu, and Y. J. Lee, "Visual instruction tuning," in Advances in Neural Information Processing Systems (NeurIPS), vol. 36, 2023, pp. 34892-34916.
+[16] C. Li et al., "LLaVA-Med: Training a large language-and-vision assistant for biomedicine in one day," in Advances in Neural Information Processing Systems (NeurIPS), vol. 36, 2023, pp. 38419-38435.
+[17] A. E. W. Johnson et al., "MIMIC-CXR, a de-identified publicly available database of chest radiographs with free-text reports," Scientific Data, vol. 6, p. 317, Dec. 2019.
+[18] P. Melendez Rojas, "The current landscape of automatic radiology report generation with deep learning: A scoping review," AI, vol. 6, no. 1, pp. 8-24, Jan. 2025.
+[19] H. Sung et al., "Global Cancer Statistics 2020: GLOBOCAN estimates of incidence and mortality worldwide for 36 cancers in 185 countries," CA: A Cancer Journal for Clinicians, vol. 71, no. 3, pp. 209-249, May 2021.
+[20] T. Nakaura et al., "The impact of large language models on radiology: a guide for radiologists on the latest innovations in AI," Japanese Journal of Radiology, vol. 42, no. 7, pp. 685–696, Jul. 2024. 
